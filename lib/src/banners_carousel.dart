@@ -1,9 +1,7 @@
 import 'package:banner_carousel/banner_carousel.dart';
 import 'package:flutter/material.dart';
 
-import 'banner_model.dart';
 import 'banner_widget.dart';
-import 'indicator_model.dart';
 import 'indicators_widget.dart';
 
 /// Creates a horizontal scrollable list that works from an explicit
@@ -219,7 +217,8 @@ class _BannerCarouselState extends State<BannerCarousel> {
       child: Stack(
         children: [
           Container(
-            decoration: _boxDecoration,
+            //Jagie
+            // decoration: _boxDecoration,
             height: widget.height,
             child: PageView(
               controller: widget.pageController ??
