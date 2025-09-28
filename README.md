@@ -4,14 +4,16 @@ BannerCarousel is a custom widget that builds a FullScreen carousel or not, with
 
 <img src="https://github.com/MaiaraM/banner_carousel/blob/main/screenshots/customcarousel.gif?raw=true" alt="drawing" width="350"/>
 
-- [Parameters](#Parameters)
-- [Models](#Models)
-- [Examples](#Examples)
-  - [Default](#Default)
-  - [FullScreen](#FullScreen)
-  - [Custom Carousel](#Custom-carousel)
-  - [Custom Banner](#Custom-carousel)
-  - [OnTap Event](#Ontap-event)
+- [BannerCarousel](#bannercarousel)
+  - [Parameters](#parameters)
+  - [Models](#models)
+  - [Example](#example)
+    - [Default:](#default)
+    - [FullScreen:](#fullscreen)
+    - [Custom Carousel:](#custom-carousel)
+    - [Custom Banner:](#custom-banner)
+    - [Ontap Event:](#ontap-event)
+    - [Improvement](#improvement)
 
 
 
@@ -142,3 +144,9 @@ BannerCarousel(
   onTap: (id) => print(id),
 )
 ```
+
+
+### Improvement
+1. add loop and autoScrollIntervalInSeconds to BannerCarousel's constructor, by them, you can let BannerCarousel scroll infinitely and automatically
+2. replace NetworkImage with Cached_Network_Image
+3. upgrade dart and flutter version  
