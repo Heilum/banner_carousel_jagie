@@ -37,6 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           ///Base
           BannerCarousel(
+            loop: true,
+            autoScrollIntervalInSeconds: 3,
             banners: BannerImages.listBanners,
             onTap: (id) => print(id),
           ),

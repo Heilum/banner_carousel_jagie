@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:banner_carousel/banner_carousel.dart';
 import 'package:flutter/material.dart';
 
@@ -9,8 +11,11 @@ import 'indicators_widget.dart';
 ///
 /// Along with a row of indicators and as an animation for each page change.
 class BannerCarousel extends StatefulWidget {
-  static const IndicatorModel _indicatorModel =
-      IndicatorModel.animation(width: 10, height: 10, spaceBetween: 3.0);
+  static const IndicatorModel _indicatorModel = IndicatorModel.animation(
+    width: 10,
+    height: 10,
+    spaceBetween: 3.0,
+  );
 
   /// [banners] List of BannerModel.
   /// The [imagePath] can be assert Path or Network Path
@@ -92,6 +97,15 @@ class BannerCarousel extends StatefulWidget {
   /// Margin between the banner
   final PageController? pageController;
 
+  /// Whether the PageView should loop infinitely
+  /// Default value [true]
+  final bool loop;
+
+  /// Auto scroll interval in seconds
+  /// If <= 0, auto scroll is disabled
+  /// Default value [0] (disabled)
+  final int autoScrollIntervalInSeconds;
+
   /// ```dart
   ///  BannersCarousel(banners: BannerImages.listBanners)
   /// ```
@@ -115,13 +129,18 @@ class BannerCarousel extends StatefulWidget {
     this.customizedBanners,
     this.spaceBetween = 0,
     this.pageController,
-  })  : assert(banners != null || customizedBanners != null,
-            'banners or customizedBanners need to be implemented'),
-        assert(
-            banners == null || customizedBanners == null,
-            'Cannot provide both a banners and a customizedBanners\n'
-            'Choose only one to implement'),
-        super(key: key);
+    this.loop = true,
+    this.autoScrollIntervalInSeconds = 0,
+  }) : assert(
+         banners != null || customizedBanners != null,
+         'banners or customizedBanners need to be implemented',
+       ),
+       assert(
+         banners == null || customizedBanners == null,
+         'Cannot provide both a banners and a customizedBanners\n'
+         'Choose only one to implement',
+       ),
+       super(key: key);
 
   ///
   /// ```dart
@@ -144,16 +163,21 @@ class BannerCarousel extends StatefulWidget {
     this.customizedBanners,
     this.customizedIndicators = _indicatorModel,
     this.pageController,
-  })  : this.width = double.maxFinite,
-        this.spaceBetween = 0.0,
-        this.margin = EdgeInsets.zero,
-        assert(banners != null || customizedBanners != null,
-            'banners or customizedBanners need to be implemented'),
-        assert(
-            banners == null || customizedBanners == null,
-            'Cannot provide both a banners and a customizedBanners\n'
-            'Choose only one to implement'),
-        super(key: key);
+    this.loop = true,
+    this.autoScrollIntervalInSeconds = 0,
+  }) : this.width = double.maxFinite,
+       this.spaceBetween = 0.0,
+       this.margin = EdgeInsets.zero,
+       assert(
+         banners != null || customizedBanners != null,
+         'banners or customizedBanners need to be implemented',
+       ),
+       assert(
+         banners == null || customizedBanners == null,
+         'Cannot provide both a banners and a customizedBanners\n'
+         'Choose only one to implement',
+       ),
+       super(key: key);
 
   @override
   _BannerCarouselState createState() => _BannerCarouselState();
@@ -161,27 +185,89 @@ class BannerCarousel extends StatefulWidget {
 
 class _BannerCarouselState extends State<BannerCarousel> {
   late int _page;
+  late PageController _pageController;
+  Timer? _autoScrollTimer;
+  late int _actualPage;
 
   @override
   void initState() {
     _page = widget.initialPage;
+    _actualPage = widget.initialPage;
+
+    // Initialize page controller
+    _pageController =
+        widget.pageController ??
+        PageController(
+          initialPage: widget.loop
+              ? widget.initialPage + 1000
+              : widget.initialPage,
+          viewportFraction: widget.viewportFraction,
+        );
+
+    // Start auto scroll if enabled
+    _startAutoScroll();
+
     super.initState();
   }
 
-  /// Shadow Banner
-  bool get _showShadow =>
-      widget.viewportFraction == 1 && widget.customizedBanners == null;
-  Color get _shadowColor => Colors.black.withOpacity(_showShadow ? 0.25 : 0.0);
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    if (widget.pageController == null) {
+      _pageController.dispose();
+    }
+    super.dispose();
+  }
+
+  void _startAutoScroll() {
+    if (widget.autoScrollIntervalInSeconds > 0 && _banners.length > 1) {
+      _autoScrollTimer = Timer.periodic(
+        Duration(seconds: widget.autoScrollIntervalInSeconds),
+        (timer) {
+          if (_pageController.hasClients) {
+            _nextPage();
+          }
+        },
+      );
+    }
+  }
+
+  void _nextPage() {
+    if (widget.loop) {
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      final nextPage = (_actualPage + 1) % _banners.length;
+      _pageController.animateToPage(
+        nextPage,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void _pauseAutoScroll() {
+    _autoScrollTimer?.cancel();
+  }
+
+  void _resumeAutoScroll() {
+    _pauseAutoScroll();
+    _startAutoScroll();
+  }
 
   Color get _activeColor => widget.activeColor ?? Color(0xFF10306D);
   Color get _disableColor => widget.disableColor ?? Color(0xFFC4C4C4);
 
   List<dynamic> get _banners => widget.customizedBanners ?? widget.banners!;
 
-  List<Widget> get _listBanners =>
-      widget.customizedBanners ??
-      widget.banners!
-          .map((banner) => BannerWidget(
+  List<Widget> get _listBanners {
+    final originalBanners =
+        widget.customizedBanners ??
+        widget.banners!
+            .map(
+              (banner) => BannerWidget(
                 key: Key("Banner${banner.id}"),
                 bannerModel: banner,
                 spaceBetween: widget.spaceBetween,
@@ -189,19 +275,34 @@ class _BannerCarouselState extends State<BannerCarousel> {
                     ? () => widget.onTap!(banner.id)
                     : () => print("Double Tap Banner ${banner.id}"),
                 borderRadius: widget.borderRadius,
-              ))
-          .toList();
+              ),
+            )
+            .toList();
+
+    if (widget.loop && originalBanners.length > 1) {
+      // Create infinite loop by repeating banners
+      final loopedBanners = <Widget>[];
+      for (int i = 0; i < 2000; i++) {
+        loopedBanners.add(originalBanners[i % originalBanners.length]);
+      }
+      return loopedBanners;
+    }
+
+    return originalBanners;
+  }
 
   List<Widget> get rowIndicator => _banners
       .asMap()
       .entries
-      .map((e) => CarouselIndicatorWidget(
-            key: Key("Indicator${e.key}"),
-            active: _page == e.key,
-            color: _page == e.key ? _activeColor : _disableColor,
-            animation: widget.animation,
-            sizeIndicator: widget.customizedIndicators,
-          ))
+      .map(
+        (e) => CarouselIndicatorWidget(
+          key: Key("Indicator${e.key}"),
+          active: _page == e.key,
+          color: _page == e.key ? _activeColor : _disableColor,
+          animation: widget.animation,
+          sizeIndicator: widget.customizedIndicators,
+        ),
+      )
       .toList();
 
   double get _totalHeigth => widget.indicatorBottom && widget.showIndicator
@@ -220,49 +321,46 @@ class _BannerCarouselState extends State<BannerCarousel> {
             //Jagie
             // decoration: _boxDecoration,
             height: widget.height,
-            child: PageView(
-              controller: widget.pageController ??
-                  PageController(
-                      initialPage: widget.initialPage,
-                      viewportFraction: widget.viewportFraction),
-              onPageChanged: (index) => _onChangePage(index),
-              children: _listBanners,
+            child: GestureDetector(
+              onPanDown: (_) => _pauseAutoScroll(),
+              onPanEnd: (_) => _resumeAutoScroll(),
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) => _onChangePage(index),
+                children: _listBanners,
+              ),
             ),
           ),
-          widget.showIndicator ? _indicatorRow : SizedBox()
+          widget.showIndicator ? _indicatorRow : SizedBox(),
         ],
       ),
     );
   }
 
   Align get _indicatorRow => Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: rowIndicator,
-          ),
-        ),
-      );
-
-  BoxDecoration get _boxDecoration => BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: _shadowColor,
-            spreadRadius: 0,
-            blurRadius: 4,
-            offset: Offset(0, 3),
-          ),
-        ],
-      );
+    alignment: Alignment.bottomCenter,
+    child: Padding(
+      padding: EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: rowIndicator,
+      ),
+    ),
+  );
 
   /// Method for when to change the page
   /// returning an integer value
   void _onChangePage(int index) {
-    if (widget.onPageChanged != null) {
-      widget.onPageChanged!(index);
+    if (widget.loop) {
+      _actualPage = index % _banners.length;
+    } else {
+      _actualPage = index;
     }
-    setState(() => _page = index);
+
+    if (widget.onPageChanged != null) {
+      widget.onPageChanged!(_actualPage);
+    }
+
+    setState(() => _page = _actualPage);
   }
 }
