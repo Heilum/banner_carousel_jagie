@@ -1,4 +1,5 @@
 import 'package:banner_carousel/banner_carousel.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -20,16 +21,31 @@ class BannerWidget extends StatelessWidget {
     this.borderRadius = 5,
     this.spaceBetween = 0,
     required VoidCallback onTap,
-  })   : _bannerModel = bannerModel,
-        _onTap = onTap,
-        super(key: key);
+  }) : _bannerModel = bannerModel,
+       _onTap = onTap,
+       super(key: key);
 
-  ImageProvider get _getImage {
+  Widget _buildImage() {
     if (_bannerModel.imagePath.contains("https://") ||
         _bannerModel.imagePath.contains("http://")) {
-      return NetworkImage(_bannerModel.imagePath);
+      return CachedNetworkImage(
+        imageUrl: _bannerModel.imagePath,
+        fit: _bannerModel.boxFit,
+        width: double.maxFinite,
+        placeholder: (context, url) => Container(
+          color: Colors.grey[300],
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+        errorWidget: (context, url, error) =>
+            Container(color: Colors.grey[300], child: const Icon(Icons.error)),
+      );
+    } else {
+      return Image.asset(
+        _bannerModel.imagePath,
+        fit: _bannerModel.boxFit,
+        width: double.maxFinite,
+      );
     }
-    return AssetImage(_bannerModel.imagePath);
   }
 
   @override
@@ -38,14 +54,11 @@ class BannerWidget extends StatelessWidget {
       onTap: _onTap,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: spaceBetween),
-        decoration: BoxDecoration(
-            image: DecorationImage(
-              image: _getImage,
-              fit: _bannerModel.boxFit,
-            ),
-            borderRadius: BorderRadius.circular(borderRadius)),
         width: double.maxFinite,
-        // child: SizedBox(),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(borderRadius),
+          child: _buildImage(),
+        ),
       ),
     );
   }

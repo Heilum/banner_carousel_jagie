@@ -1,0 +1,34 @@
+{
+    "sourceFile": "pubspec.yaml",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1759067661914,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1759067915887,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,19 @@\n+name: banner_carousel\n+description: A Widget horizontal scrollable list with indicator and animations.\n+version: 1.2.1\n+homepage: https://github.com/MaiaraM/banner_carousel\n+\n+environment:\n+  sdk: '>3.0.0'\n+  flutter: \">=1.17.0\"\n+\n+dependencies:\n+  cached_network_image: ^3.4.1\n+  flutter:\n+    sdk: flutter\n+\n+dev_dependencies:\n+  flutter_test:\n+    sdk: flutter\n+\n+flutter:\n"
+                },
+                {
+                    "date": 1759067921408,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n homepage: https://github.com/MaiaraM/banner_carousel\n \n environment:\n   sdk: '>3.0.0'\n-  flutter: \">=1.17.0\"\n+  flutter: \">3.0.0\"\n \n dependencies:\n   cached_network_image: ^3.4.1\n   flutter:\n@@ -16,23 +16,4 @@\n   flutter_test:\n     sdk: flutter\n \n flutter:\n-name: banner_carousel\n-description: A Widget horizontal scrollable list with indicator and animations.\n-version: 1.2.1\n-homepage: https://github.com/MaiaraM/banner_carousel\n-\n-environment:\n-  sdk: '>=2.12.0 <3.0.0'\n-  flutter: \">=1.17.0\"\n-\n-dependencies:\n-  cached_network_image: ^3.4.1\n-  flutter:\n-    sdk: flutter\n-\n-dev_dependencies:\n-  flutter_test:\n-    sdk: flutter\n-\n-flutter:\n"
+                },
+                {
+                    "date": 1759067940436,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,9 +3,9 @@\n version: 1.2.1\n homepage: https://github.com/MaiaraM/banner_carousel\n \n environment:\n-  sdk: '>3.0.0'\n+  sdk: '>=3.9.0'\n   flutter: \">3.0.0\"\n \n dependencies:\n   cached_network_image: ^3.4.1\n"
+                },
+                {
+                    "date": 1759067957784,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,9 @@\n homepage: https://github.com/MaiaraM/banner_carousel\n \n environment:\n   sdk: '>=3.9.0'\n-  flutter: \">3.0.0\"\n+  flutter: \">=3.35.0\"\n \n dependencies:\n   cached_network_image: ^3.4.1\n   flutter:\n"
+                }
+            ],
+            "date": 1759067661914,
+            "name": "Commit-0",
+            "content": "name: banner_carousel\ndescription: A Widget horizontal scrollable list with indicator and animations.\nversion: 1.2.1\nhomepage: https://github.com/MaiaraM/banner_carousel\n\nenvironment:\n  sdk: '>=2.12.0 <3.0.0'\n  flutter: \">=1.17.0\"\n\ndependencies:\n  cached_network_image: ^3.4.1\n  flutter:\n    sdk: flutter\n\ndev_dependencies:\n  flutter_test:\n    sdk: flutter\n\nflutter:\n"
+        }
+    ]
+}
