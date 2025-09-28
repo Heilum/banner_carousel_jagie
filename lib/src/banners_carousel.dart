@@ -249,12 +249,17 @@ class _BannerCarouselState extends State<BannerCarousel> {
   }
 
   void _pauseAutoScroll() {
+    debugPrint('pauseAutoScroll');
     _autoScrollTimer?.cancel();
   }
 
   void _resumeAutoScroll() {
-    _pauseAutoScroll();
-    _startAutoScroll();
+    debugPrint('resumeAutoScroll');
+    // Only resume auto-scroll if it's enabled (autoScrollIntervalInSeconds > 0)
+    if (widget.autoScrollIntervalInSeconds > 0) {
+      _pauseAutoScroll();
+      _startAutoScroll();
+    }
   }
 
   Color get _activeColor => widget.activeColor ?? Color(0xFF10306D);
@@ -321,9 +326,17 @@ class _BannerCarouselState extends State<BannerCarousel> {
             //Jagie
             // decoration: _boxDecoration,
             height: widget.height,
-            child: GestureDetector(
-              onPanDown: (_) => _pauseAutoScroll(),
-              onPanEnd: (_) => _resumeAutoScroll(),
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification notification) {
+                if (notification is ScrollStartNotification) {
+                  // User started scrolling
+                  _pauseAutoScroll();
+                } else if (notification is ScrollEndNotification) {
+                  // User finished scrolling
+                  _resumeAutoScroll();
+                }
+                return false;
+              },
               child: PageView(
                 controller: _pageController,
                 onPageChanged: (index) => _onChangePage(index),
