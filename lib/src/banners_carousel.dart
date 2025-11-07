@@ -249,12 +249,12 @@ class _BannerCarouselState extends State<BannerCarousel> {
   }
 
   void _pauseAutoScroll() {
-    debugPrint('pauseAutoScroll');
+    //debugPrint('pauseAutoScroll');
     _autoScrollTimer?.cancel();
   }
 
   void _resumeAutoScroll() {
-    debugPrint('resumeAutoScroll');
+    //debugPrint('resumeAutoScroll');
     // Only resume auto-scroll if it's enabled (autoScrollIntervalInSeconds > 0)
     if (widget.autoScrollIntervalInSeconds > 0) {
       _pauseAutoScroll();
