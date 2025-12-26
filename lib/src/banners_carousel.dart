@@ -205,7 +205,9 @@ class _BannerCarouselState extends State<BannerCarousel> {
         );
 
     // Start auto scroll if enabled
-    _startAutoScroll();
+    Future.delayed(const Duration(seconds: 3), () {
+      _startAutoScroll();
+    });
 
     super.initState();
   }
